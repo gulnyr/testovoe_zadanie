@@ -81,38 +81,58 @@ async помечается функция, исполняющая асинхро
           child: FutureBuilder( //свойства дочерних виджетов
             future: getRequest(),
             builder: (BuildContext ctx, AsyncSnapshot snapshot) {
+              /*
+              connectionState - указывает на текущее состояние соединения
+              ConnectionState.done - если готово
+              */
+              if(snapshot.connectionState == ConnectionState.done) {
 /*
 snapshot.data?.length > 0 - условие, если количество наших данных в отрисовке больше 0.
 ListView.builder - берет список дочерних элементов и делает из него список с возможностью прокрутки
  */
-              return snapshot.data?.length > 0 ? ListView.builder(
-                itemCount: snapshot.data?.length, //оно равно количеству объектов в списке snapshot.data
-                //itemBuilder - для создания элементов в ListView
-                itemBuilder: (ctx, index) => ListTile( //ListTile - представляет строку фиксированной высоты
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  //оно равно количеству объектов в списке snapshot.data
+                  //itemBuilder - для создания элементов в ListView
+                  itemBuilder: (ctx, index) =>
+                      ListTile( //ListTile - представляет строку фиксированной высоты
 /*
 onTap нажатие на элемент. После нажатия откроется второй экран DetailScreen, для него мы передаем данные, ссылка на фото: snapshot.data[index].download_url
 Navigator.push() — метод который добавляет новый route в иерархию виджетов
 MaterialPageRoute() — Модальный route, который заменяет весь экран адаптивным к платформе переходом анимации
 builder — возвращает пользовательский интерфейс
  */
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(photoDetail: snapshot.data[index].download_url))),
-                  title: Text("Автор: "+snapshot.data[index].author+"\n"+"Размер: "+"\n"+"Ширина: "+"${snapshot.data[index].width}"+"\n"+"Высота: "+"${snapshot.data[index].height}"+"\n"+"Ссылка на скачивание: "+"${snapshot.data[index].download_url}"),
-                  contentPadding: EdgeInsets.only(bottom: 20.0),
-                  leading: CircleAvatar( //просто круг, делает изображение круглым
-                    radius: 30.0, //размер изображения
-                    backgroundImage:
-                    NetworkImage("${snapshot.data[index].download_url}"),//ссылка на изображение
-                  ),
-                ),
-              ):CircularProgressIndicator(); //индикатор прогресса
+                        onTap: () =>
+                            Navigator.push(context, MaterialPageRoute(builder: (
+                                context) => DetailScreen(
+                                photoDetail: snapshot.data[index]
+                                    .download_url))),
+                        title: Text("Автор: " + snapshot.data[index].author +
+                            "\n" + "Размер: " + "\n" + "Ширина: " +
+                            "${snapshot.data[index].width}" + "\n" +
+                            "Высота: " + "${snapshot.data[index].height}" +
+                            "\n" + "Ссылка на скачивание: " + "${snapshot
+                            .data[index].download_url}"),
+                        contentPadding: EdgeInsets.only(bottom: 20.0),
+                        leading: CircleAvatar( //просто круг, делает изображение круглым
+                          radius: 30.0, //размер изображения
+                          backgroundImage:
+                          NetworkImage("${snapshot.data[index]
+                              .download_url}"), //ссылка на изображение
+                        ),
+                      ),
+                );
+              }else{
+                return CircularProgressIndicator();
+              }//индикатор прогресса
             },
           ),
         ),
       ),
     );
   }
-}
 
+}
 class DetailScreen extends StatelessWidget { //класс для второго экрана, полный размер изображения
   DetailScreen({@required this.photoDetail}); //пометить photoDetail как обязательное, чтобы передать какое-либо значение
   final photoDetail; //делаем константой
